@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Admin.css';
+import API_URL from '../utils/api';
 
 const Admin = () => {
   const [users, setUsers] = useState([]);
@@ -22,7 +23,7 @@ const Admin = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/users');
+      const response = await fetch(`${API_URL}/users`);
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       setUsers(data);
@@ -33,7 +34,7 @@ const Admin = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/products');
+      const response = await fetch(`${API_URL}/api/products`);
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       setProducts(data);
@@ -51,7 +52,7 @@ const Admin = () => {
   const handleProductUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${editingProduct.id}`, {
+      const response = await fetch(`${API_URL}/api/products/${editingProduct.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ const Admin = () => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`${API_URL}/api/products/${id}`, {
         method: 'DELETE',
       });
 
@@ -89,7 +90,7 @@ const Admin = () => {
   const handleNewProductSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +115,7 @@ const Admin = () => {
 
     try {
       const admin = JSON.parse(sessionStorage.getItem('admin'));
-      const response = await fetch(`http://localhost:5000/admin/users/${userId}`, {
+      const response = await fetch(`${API_URL}/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${admin.token}`

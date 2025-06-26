@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useCart } from './CartContext';
 import './Shop.css';
+import API_URL from '../utils/api';
 
 // Fallback products data
 const fallbackProducts = [
@@ -50,9 +51,9 @@ const Shop = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch(`${API_URL}/api/products`);
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          throw new Error('Network response was not ok');
         }
         const data = await response.json();
         setProducts(data);

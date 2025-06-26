@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
 import './AdminLogin.css';
+import { AuthContext } from './AuthContext';
+import API_URL from '../utils/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/admin/login', {
+      const response = await fetch(`${API_URL}/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
