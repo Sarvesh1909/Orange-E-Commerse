@@ -44,10 +44,10 @@ const validatePassword = (password) => {
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Sarvesh@123',
-  database: 'users_db',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Sarvesh@123',
+  database: process.env.DB_NAME || 'users_db',
 }).promise(); // Use promise-based connection
 
 // Handle database connection errors
@@ -262,7 +262,7 @@ const authenticateAdmin = async (req, res, next) => {
 };
 
 // Admin login
-app.post('/admin/login', async (req, res) => {
+app.post('/api/admin/login', async (req, res) => {
   try {
   const { username, password } = req.body;
     console.log('Admin login attempt:', { username, password: password ? '****' : undefined });
@@ -531,7 +531,7 @@ app.put('/admin/change-password', authenticateAdmin, async (req, res) => {
 });
 
 // User signup
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   try {
     console.log('Received signup request:', req.body);
     const { firstName, lastName, username, city, state, password, confirmPassword } = req.body;
@@ -606,7 +606,7 @@ app.post('/signup', async (req, res) => {
 });
 
 // User login
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
   console.log('Received login request:', req.body);
   const { username, password } = req.body;
@@ -690,7 +690,7 @@ app.post('/login', async (req, res) => {
 });
 
 // Get all users
-app.get('/users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
   console.log('Fetching all users');
     const [users] = await db.query('SELECT id, first_name AS firstName, last_name AS lastName, username, city, state FROM users');
@@ -703,7 +703,7 @@ app.get('/users', async (req, res) => {
 });
 
 // Update user
-app.put('/users/:id', async (req, res) => {
+app.put('/api/users/:id', async (req, res) => {
   try {
   const { id } = req.params;
   const { firstName, lastName, username, city, state } = req.body;
@@ -725,7 +725,7 @@ app.put('/users/:id', async (req, res) => {
 });
 
 // Delete user
-app.delete('/users/:id', async (req, res) => {
+app.delete('/api/users/:id', async (req, res) => {
   try {
   const { id } = req.params;
   console.log('Deleting user:', id);
@@ -752,7 +752,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 // Add new product (admin only)
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', authenticateAdmin, async (req, res) => {
   try {
     const { name, description, price, image } = req.body;
     
@@ -780,7 +780,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 // Update product (admin only)
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, image } = req.body;
@@ -805,7 +805,7 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 // Delete product (admin only)
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -830,7 +830,7 @@ const requireSuperAdmin = async (req, res, next) => {
 };
 
 // List all admin users
-app.get('/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) => {
+app.get('/api/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const [admins] = await db.query(`
       SELECT 
@@ -854,7 +854,7 @@ app.get('/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) =
 });
 
 // Create new admin user
-app.post('/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) => {
+app.post('/api/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const { username, password, email, firstName, lastName, role } = req.body;
 
@@ -929,7 +929,7 @@ app.post('/admin/users', authenticateAdmin, requireSuperAdmin, async (req, res) 
 });
 
 // Update admin user
-app.put('/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req, res) => {
+app.put('/api/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { email, firstName, lastName, role, status } = req.body;
@@ -999,7 +999,7 @@ app.put('/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req, re
 });
 
 // Delete admin user
-app.delete('/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req, res) => {
+app.delete('/api/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1035,7 +1035,7 @@ app.delete('/admin/users/:id', authenticateAdmin, requireSuperAdmin, async (req,
 });
 
 // Reset admin password
-app.post('/admin/users/:id/reset-password', authenticateAdmin, requireSuperAdmin, async (req, res) => {
+app.post('/api/admin/users/:id/reset-password', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { newPassword } = req.body;
@@ -1086,7 +1086,7 @@ app.post('/admin/users/:id/reset-password', authenticateAdmin, requireSuperAdmin
 });
 
 // Delete user
-app.delete('/admin/users/:userId', authenticateAdmin, async (req, res) => {
+app.delete('/api/admin/users/:userId', authenticateAdmin, requireSuperAdmin, async (req, res) => {
   try {
     const userId = req.params.userId;
     
